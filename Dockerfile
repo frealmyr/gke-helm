@@ -3,8 +3,11 @@ FROM google/cloud-sdk:277.0.0-alpine AS gcloud
 
 FROM alpine:3.11
 
-COPY --from=helm /usr/bin/helm /usr/local/bin/helm
-COPY --from=gcloud /google-cloud-sdk/bin/gcloud /usr/local/bin/gcloud
+RUN apk add --update --no-cache python3 \
+    && rm -rf /var/cache/apk/*
 
-ENV LANG C.UTF-8
-ENV LC_ALL C.UTF-8
+COPY --from=helm /usr/bin/helm /usr/local/bin/helm
+COPY --from=gcloud /google-cloud-sdk/bin/gcloud /usr/lib/google-cloud-sdk/bin/gcloud
+COPY --from=gcloud /google-cloud-sdk/lib /usr/lib/google-cloud-sdk/lib
+
+ENTRYPOINT ["/usr/local/bin/helm"]
